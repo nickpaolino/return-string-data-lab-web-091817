@@ -1,1 +1,32 @@
+<% @products.each do |product| %>
+  <div class="body-<%= product.id %>">
+  <%= product.name %><br>
+  <%= product.price %><br>
+  <div class="description-<%= product.id %>"><%= truncate product.description %></div>
+  <button class="js-more" data-id="<%= product.id %>">More Info</button><br><br>
+  </div>
+<% end %>
 
+<script type="text/javascript">
+  document.body.addEventListener('click', (ev) => {
+    if (ev.target.className === "js-more"){
+      ev.preventDefault();
+      var id = ev.target.dataset.id;
+      $.get("/products/" + id + "/description", function(textData) {
+        var body = document.querySelector(`.body-${id}`);
+        var p = document.createElement('p');
+        var div = document.querySelector(`.description-${id}`);
+        div.remove()
+        p.innerText = textData;
+        body.appendChild(p);
+    });
+      $.get("/products/" + id + "/inventory", function(inventoryData) {
+        var body = document.querySelector(`.body-${id}`);
+        var p = document.createElement('p');
+        var inventory = inventoryData == "true" ? "Available" : "Sold Out";
+        p.innerText = inventory;
+        body.appendChild(p);
+  });
+    }
+  })
+</script>
